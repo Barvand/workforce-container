@@ -1,0 +1,43 @@
+version: "3.8"
+
+services:
+
+  client:
+    build: ./client
+    ports:
+      - "5173:5173"
+    working_dir: /app
+    command: ["npm", "run", "dev"]
+    volumes:
+      - ./client:/src
+      - /src/node_modules
+    depends_on:
+      - server
+
+  server:
+    build: ./server
+    ports:
+      - "8800:8800"
+    working_dir: /src
+    command: ["npm", "run", "start"]
+    volumes:
+      - ./server:/src
+      - /node_modules
+    env_file:
+      - ./server/.env       # ✅ explicit path
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mysql:8
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: ${DB_NAME}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+volumes:
+  mysql-data:
