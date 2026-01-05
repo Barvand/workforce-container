@@ -1,7 +1,4 @@
-version: "3.8"
-
 services:
-
   client:
     build: ./client
     ports:
@@ -9,8 +6,8 @@ services:
     working_dir: /app
     command: ["npm", "run", "dev"]
     volumes:
-      - ./client:/src
-      - /src/node_modules
+      - ./client:/app              
+      - /app/node_modules    
     depends_on:
       - server
 
@@ -20,28 +17,29 @@ services:
     ports:
       - "8800:8800"
     working_dir: /src
-    command: ["npm", "run", "start"]
+    command: ["npm", "run", "dev"] 
     volumes:
-      - ./server:/src
-      - /node_modules
+      - ./server:/src                
+      - /src/node_modules           
     env_file:
-      - ./server/.env       # ✅ explicit path
+      - ./server/.env
     depends_on:
       - mysql
 
   mysql:
-    image: mysql:8
+    image: mysql
     restart: always
     container_name: workforce-mysql-1
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
       MYSQL_DATABASE: ${DB_NAME}
-      DB_HOST: mysql
-      command: --default-authentication-plugin=mysql_native_password
+      DB_HOST: workforce-mysql-1
+    command: --default-authentication-plugin=mysql_native_password
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
-      - mysql-data:/var/lib/mysql
+      - workforce_mysql-data:/var/lib/mysql
 
 volumes:
-  mysql-data:
+  workforce_mysql-data:
+    external: true
