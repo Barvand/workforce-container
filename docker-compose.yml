@@ -17,7 +17,7 @@ services:
     ports:
       - "8800:8800"
     working_dir: /src
-    command: ["npm", "run", "dev"]   # ✅ Changed to dev for nodemon
+    command: ["npm", "run", "start"]   # ✅ Changed to dev for nodemon
     volumes:
       - ./server:/src                # ✅ Correct
       - /src/node_modules            # ✅ Fixed path
@@ -34,7 +34,6 @@ services:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
       MYSQL_DATABASE: ${DB_NAME}
       DB_HOST: workforce-mysql-1
-    command: --default-authentication-plugin=mysql_native_password
     ports:
       - "3307:3306"
     volumes:
