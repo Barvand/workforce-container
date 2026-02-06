@@ -4,27 +4,28 @@ services:
     ports:
       - "5173:5173"
     working_dir: /app
-    command: ["npm", "run", "dev"]
+    command: npm run dev
     volumes:
-      - ./client:/app              # ✅ Match working_dir
-      - /app/node_modules          # ✅ Match working_dir
+      - ./client:/app
+      - /app/node_modules
     depends_on:
       - server
 
   server:
-    build: ./server
-    container_name: workforce-server-1
-    ports:
-      - "8800:8800"
-    working_dir: /src
-    command: ["npm", "run", "start"]   # ✅ Changed to dev for nodemon
-    volumes:
-      - ./server:/src                # ✅ Correct
-      - /src/node_modules            # ✅ Fixed path
-    env_file:
-      - ./server/.env
-    depends_on:
-      - mysql
+   build: ./server
+   container_name: workforce-server-1
+   ports:
+    - "8800:8800"
+   working_dir: /src
+   command: npm run start
+   volumes:
+    - ./server:/src
+    - ~/Desktop/workforce/uploads:/src/uploads
+   env_file:
+    - ./server/.env
+   depends_on:
+    - mysql
+
 
   mysql:
     image: mysql
@@ -33,7 +34,6 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
       MYSQL_DATABASE: ${DB_NAME}
-      DB_HOST: workforce-mysql-1
     ports:
       - "3307:3306"
     volumes:
