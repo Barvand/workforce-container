@@ -22,9 +22,8 @@ makeRequest.interceptors.request.use((config) => {
   const token = getAccessToken();
   if (token) {
     config.headers = config.headers ?? {};
-    (
-      config.headers as Record<string, string>
-    ).Authorization = `Bearer ${token}`;
+    (config.headers as Record<string, string>).Authorization =
+      `Bearer ${token}`;
   }
   return config;
 });
@@ -71,5 +70,5 @@ makeRequest.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  }
+  },
 );
