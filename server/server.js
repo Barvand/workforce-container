@@ -9,10 +9,14 @@ import cookieParser from "cookie-parser";
 import usersRoutes from "./src/routes/users.js";
 import uploadRoutes from "./src/routes/upload.js";
 import path from "path";
-import errorHandler from "./src/middleware/errorHandler.js"
+import errorHandler from "./src/middleware/errorHandler.js";
 const app = express();
 app.set("trust proxy", 1);
-const allowedOrigins = ["http://localhost:5173", "https://totaltiming.app"];
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://totaltiming.app",
+  "https://www.totaltiming.app",
+];
 
 app.use(
   cors({
