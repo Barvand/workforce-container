@@ -14,18 +14,19 @@ import type { hourReviewProps, viewMode } from "../../../types";
 import HeaderToggle from "./HeaderToggle";
 import { GetProjects } from "../../../api/projects";
 import { GetAbsenceData } from "../../../api/absence";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function HourReview({
   userId,
   weekOffset: initialWeekOffset,
   projects,
-}: hourReviewProps) {
+  userName,
+}: hourReviewProps & { userName: string }) {
   // View state
 
   const [weekOffset, setWeekOffset] = useState(initialWeekOffset);
   const [monthOffset, setMonthOffset] = useState(0);
   const [viewMode, setViewMode] = useState<viewMode>("weekly");
-  // Edit state
   const [editingId, setEditingId] = useState<number | null>(null);
   const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set());
   const [start, setStart] = useState("");
@@ -37,6 +38,7 @@ export default function HourReview({
   const { data: projectsData = [] } = GetProjects();
   const { data: absenceData = [] } = GetAbsenceData();
   const updateMutation = useUpdateHour();
+  const queryClient = useQueryClient();
 
   // Maps
   const projectMap = useMemo(() => {
@@ -55,8 +57,6 @@ export default function HourReview({
     });
     return map;
   }, [absenceData]);
-
-  console.log("test ", absenceMap);
 
   // Weekly summary data
   const weeklySummary = useMemo(
@@ -104,6 +104,9 @@ export default function HourReview({
     try {
       setIsUpdating(true);
       await updateMutation.mutateAsync({ idHours, data });
+      await queryClient.invalidateQueries({
+        queryKey: ["hours", "all"],
+      });
       setEditingId(null);
       alert("Entry updated successfully.");
     } catch (err) {
@@ -115,10 +118,10 @@ export default function HourReview({
   }
 
   const monthName = formatMonthName(currentMonthDate);
-  const weekRange = `${weeklySummary.startDate.toLocaleDateString("en-US", {
+  const weekRange = `${weeklySummary.startDate.toLocaleDateString("nb-NO", {
     month: "short",
     day: "numeric",
-  })} – ${weeklySummary.endDate.toLocaleDateString("en-US", {
+  })} – ${weeklySummary.endDate.toLocaleDateString("nb-NO", {
     month: "short",
     day: "numeric",
     year: "numeric",
@@ -136,14 +139,14 @@ export default function HourReview({
         weekRange={weekRange}
         monthName={monthName}
         total={total}
+        name={userName}
       />
 
       <>
         {/* Day Entries */}
-        <div className="space-y-3 mb-6">
+        <div className="space-y-3 mb-6 mt-6">
           {sortedDates.map((dateKey) => {
             const daylogs = groupedByDate[dateKey];
-            console.log("Rendering date:", dateKey, daylogs);
             const isExpanded = expandedDays.has(dateKey);
             const dayTotal = daylogs.reduce(
               (sum, row) => sum + (Number(row.hoursWorked) || 0),
@@ -154,7 +157,7 @@ export default function HourReview({
             return (
               <div
                 key={dateKey}
-                className="8888rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow"
+                className="rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow"
               >
                 {/* Day Header */}
                 <div
@@ -163,20 +166,20 @@ export default function HourReview({
                 >
                   <div className="flex justify-between items-center">
                     <div className="flex items-center gap-3">
-                      <span className="font-semibold text-lg text-gray-900">
-                        {date.toLocaleDateString(undefined, {
+                      <span className="font-semibold text-base text-gray-900">
+                        {date.toLocaleDateString("nb-NO", {
                           weekday: "long",
                           year: "numeric",
                           month: "long",
                           day: "numeric",
                         })}
                       </span>
-                      <span className="text-xs text-gray-600 bg-white px-2.5 py-1 border font-medium">
+                      <span className="text-base text-gray-600 bg-white px-2.5 mr-2 py-1 border font-medium">
                         {daylogs.length}
                       </span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="font-bold text-blue-600 text-lg">
+                      <span className="font-bold text-blue-600 text-base">
                         {dayTotal.toFixed(2)} hrs
                       </span>
                       <span className="text-gray-400 transform transition-transform">
@@ -194,7 +197,6 @@ export default function HourReview({
                         projectMap[row.projectsId] || "Unknown Project";
                       const absenceName =
                         absenceMap[Number(row.absenceId)] || "Unknown Absence";
-                      console.log("test ", absenceMap);
                       return editingId === row.idHours ? (
                         <EditingHours
                           key={row.idHours}

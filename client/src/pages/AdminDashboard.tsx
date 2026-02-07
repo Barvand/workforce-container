@@ -1,10 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import ProjectItem from "../components/projects/ProjectItem";
 import { useCreateProject, GetProjects } from "../api/projects";
-import RefetchDataBtn from "../components/admin/refetchDataBtn";
 import FilterTabs from "../components/admin/FilterTabs";
 import SearchBar from "../components/admin/searchBar";
-import AddProjectAccordion from "../components/admin/AddProjectAccordion";
+
 import RegisterBtn from "../components/UI/buttons/RegisterAccountBtn";
 import {
   TAB_CONFIG,
@@ -16,13 +15,14 @@ import { GetAbsenceData } from "../api/absence";
 import AbsenceItem from "../components/projects/AbsenceItem";
 import ErrorMessage from "../components/UI/UX-messages/ErrorMessage";
 import AttentionMessage from "../components/UI/UX-messages/AttentionMessage";
+import AddProjectModal from "../components/admin/AddProjectModal";
 
 const initialFormData: ProjectFormData = {
   name: "",
   description: "",
-  status: "inactive",
+  status: "active",
   startDate: "",
-  completionDate: "",
+  endDate: "",
   projectCode: "",
 };
 
@@ -31,20 +31,21 @@ export default function Dashboard() {
   const [search, setSearch] = useState("");
   const [showAddProject, setShowAddProject] = useState(false);
   const [mode, setMode] = useState<"projects" | "absence">("projects");
-  const { data: projects = [], isLoading, error, refetch } = GetProjects();
+  const { data: projects = [], isLoading, error } = GetProjects();
   const { data: absence = [] } = GetAbsenceData();
-  const displayedProjects = filterProjects(projects, activeTab, search);
   const [formData, setFormData] = useState<ProjectFormData>(initialFormData);
-
   const createMutation = useCreateProject();
+  const displayedProjects = useMemo(() => {
+    return [...filterProjects(projects, activeTab, search)].sort(
+      (a, b) => Number(b.projectCode) - Number(a.projectCode),
+    );
+  }, [projects, activeTab, search]);
 
   // ✅ Reset form + close accordion after successful create
   useEffect(() => {
     if (createMutation.isSuccess) {
       setFormData(initialFormData);
       setShowAddProject(false);
-
-      // Prevent "sticky success" from retriggering on next renders
       createMutation.reset();
     }
   }, [createMutation.isSuccess, createMutation]);
@@ -53,11 +54,25 @@ export default function Dashboard() {
     <div className="p-4 max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold text-gray-800 mb-4">Adminstrator</h1>
       <AttentionMessage message="Her kan du opprette prosjekter og brukerkontoer for dine ansatte." />
+      <h2 className="text-lg font-semibold mb-1">Hva vil du gjøre?</h2>
 
-      <RefetchDataBtn refetch={refetch} isLoading={isLoading} />
-      <RegisterBtn />
-      <SearchBar search={search} setSearch={setSearch} />
+      <p className="text-sm text-gray-600 mb-3">
+        Start med å opprette et prosjekt eller legge til ansatte.
+      </p>
 
+      <div className="bg-gray-50 p-4 mb-10 mt-10">
+        <div className="flex gap-3 flex-wrap items-center">
+          <button
+            onClick={() => setShowAddProject(true)}
+            className="px-4 py-2 bg-blue-600 text-white rounded
+                 hover:bg-blue-700 transition"
+          >
+            + Nytt prosjekt
+          </button>
+
+          <RegisterBtn />
+        </div>
+      </div>
       <FilterTabs
         projects={projects}
         absence={absence}
@@ -68,11 +83,13 @@ export default function Dashboard() {
         TAB_CONFIG={TAB_CONFIG}
       />
 
-      <AddProjectAccordion
-        showAddProject={showAddProject}
-        setShowAddProject={setShowAddProject}
-        setFormData={setFormData}
+      <SearchBar search={search} setSearch={setSearch} />
+
+      <AddProjectModal
+        open={showAddProject}
+        onClose={() => setShowAddProject(false)}
         formData={formData}
+        setFormData={setFormData}
         createMutation={createMutation}
       />
 

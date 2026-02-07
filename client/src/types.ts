@@ -28,7 +28,7 @@ export type ProjectFormData = {
   description: string;
   status: ProjectStatus;
   startDate: string;
-  completionDate: string;
+  endDate: string;
   projectCode: string;
 };
 
@@ -62,4 +62,13 @@ export type EmployeeAddHourFormProps = {
   errorMsg?: string | null;
   resetMessages: () => void;
   onSubmit: (v: EmployeeAddHourFormValues) => void | Promise<void>;
+};
+
+export type GalleryImage = {
+  id: number;
+  url: string;
+  alt?: string;
+  uploadedBy: number;
+  currentUserId: number;
+  isAdmin?: boolean;
 };

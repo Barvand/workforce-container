@@ -7,6 +7,7 @@ import type { EmployeeAddHourFormValues } from "../types";
 import HourReview from "../components/employee/components/HourReview";
 import { GetAbsenceData } from "../api/absence";
 import { toISO } from "../utils/utils";
+import { AxiosError } from "axios";
 
 export default function EmployeeDashboard() {
   const { user } = useAuth();
@@ -19,6 +20,10 @@ export default function EmployeeDashboard() {
   const monday = new Date(now);
   const day = (now.getDay() + 6) % 7;
   monday.setDate(now.getDate() - day + weekOffset * 7);
+  const errorMessage = createHour.isError
+    ? (createHour.error as AxiosError<any>)?.response?.data?.message ||
+      "Kunne ikke registrere timer."
+    : null;
 
   const handleSubmit = async (v: EmployeeAddHourFormValues) => {
     if (!userId) {
@@ -53,7 +58,7 @@ export default function EmployeeDashboard() {
             successMsg={
               createHour.isSuccess ? "Hours logged successfully!" : null
             }
-            errorMsg={(createHour.error as any)?.message ?? null}
+            errorMsg={errorMessage}
             resetMessages={createHour.reset}
             onSubmit={handleSubmit}
           />
@@ -66,6 +71,7 @@ export default function EmployeeDashboard() {
               weekOffset={weekOffset}
               projects={projects}
               absence={absence}
+              userName={user?.name || ""}
             />
           )}
         </aside>

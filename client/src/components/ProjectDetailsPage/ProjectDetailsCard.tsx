@@ -4,19 +4,11 @@ interface Props {
   project: Project;
   getStatusText: (status: string) => string;
   getStatusColor: (status: string) => string;
-  onEdit: () => void;
-  onDelete: () => void;
 }
 
-function ProjectDetailsCard({
-  project,
-  getStatusText,
-  getStatusColor,
-  onEdit,
-  onDelete,
-}: Props) {
+function ProjectDetailsCard({ project, getStatusText, getStatusColor }: Props) {
   return (
-    <section className="mt-6 bg-gray-50 p-6">
+    <section className="mt-6 p-6">
       {/* Header row */}
       <div className="flex items-start justify-between">
         <div>
@@ -54,29 +46,12 @@ function ProjectDetailsCard({
             )}
           </dl>
         </div>
-
-        {/* Actions */}
-        <div className="flex items-center gap-2">
-          <button
-            onClick={onEdit}
-            className="px-3 py-1.5 text-sm border hover:bg-white transition"
-          >
-            Rediger
-          </button>
-
-          <button
-            onClick={onDelete}
-            className="px-3 py-1.5 text-sm text-red-600 hover:text-red-700 transition"
-          >
-            Slett
-          </button>
-        </div>
       </div>
 
       {/* Description */}
       <div className="mt-6 max-w-3xl">
         <p className="text-xs text-gray-500 mb-1">Beskrivelse</p>
-        <p className="text-sm text-gray-800">
+        <p className="text-sm text-gray-800 whitespace-pre-line">
           {project.description || "Ingen beskrivelse"}
         </p>
       </div>
