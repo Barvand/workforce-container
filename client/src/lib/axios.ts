@@ -5,7 +5,7 @@ const isLocal = window.location.hostname === "localhost";
 
 const BASE_URL = isLocal
   ? "http://localhost:8800/api"
-  : "https://api.totaltiming.app/api";
+  : "http://89.167.50.60:8800/api";
 
 export const makeRequest = axios.create({
   baseURL: BASE_URL,

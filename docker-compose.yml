@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
   client:
     build: ./client
@@ -12,23 +14,20 @@ services:
       - server
 
   server:
-   build: ./server
-   container_name: workforce-server-1
-   ports:
-    - "8800:8800"
-   working_dir: /src
-   command: npm run start
-   volumes:
-    - ./server:/src
-    - ~/Desktop/workforce/uploads:/src/uploads
-   env_file:
-    - ./server/.env
-   depends_on:
-    - mysql
-
+    build: ./server
+    container_name: workforce-server-1
+    ports:
+      - "8800:8800"
+    command: npm run start
+    volumes:
+      - ./uploads:/app/uploads
+    env_file:
+      - ./server/.env
+    depends_on:
+      - mysql
 
   mysql:
-    image: mysql
+    image: mysql:8.4
     restart: always
     container_name: workforce-mysql-1
     environment:
