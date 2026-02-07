@@ -15,8 +15,7 @@ app.set("trust proxy", 1);
 const allowedOrigins = [
   "http://localhost:5173",
   "https://totaltiming.app",
-  "https://www.totaltiming.app",
-];
+  "https://www.totaltiming.app",];
 
 app.use(
   cors({
