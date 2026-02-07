@@ -6,8 +6,9 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
-    host: true,      // 👈 This allows Docker external connections
+    host: true,
     port: 5173,
-    strictPort: true
-  }
+    strictPort: true,
+    allowedHosts: ["totaltiming.app", "www.totaltiming.app", "localhost"],
+  },
 });
