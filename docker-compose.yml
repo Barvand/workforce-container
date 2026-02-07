@@ -1,5 +1,4 @@
 version: "3.9"
-
 services:
   client:
     build: ./client
@@ -12,7 +11,6 @@ services:
       - /app/node_modules
     depends_on:
       - server
-
   server:
     build: ./server
     container_name: workforce-server-1
@@ -25,7 +23,6 @@ services:
       - ./server/.env
     depends_on:
       - mysql
-
   mysql:
     image: mysql:8.4
     restart: always
@@ -37,6 +34,18 @@ services:
       - "3307:3306"
     volumes:
       - workforce_mysql-data:/var/lib/mysql
+  nginx:
+    image: nginx:alpine
+    container_name: workforce-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - client
+      - server
+    restart: unless-stopped
 
 volumes:
   workforce_mysql-data:
